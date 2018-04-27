@@ -1,9 +1,13 @@
 from subprocess import call
 # Function which returns subset or r length from n
 from itertools import combinations
+import os
 
-coins = ["bitcoin", "BTCGPU", "rippled", "BitcoinDiamond", "BitcoinPrivate", "bytecoin", "litecoin", "nano"]
+#coins = ["bitcoin", "BTCGPU", "rippled", "BitcoinDiamond", "BitcoinPrivate", "bytecoin", "litecoin", "nano"]
 r = 2
+
+#change the home directory of coins
+directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
 
 # put extension of the file that will be compared
 extension = "cpp"
@@ -87,8 +91,21 @@ def getSecondFile(line):
     endindex = line.find(" material")
     return line[beginindex:endindex]
 
+def get_immediate_subdirectories(a_dir):
+    return [name for name in os.listdir(a_dir)
+            if os.path.isdir(os.path.join(a_dir, name))]
+
 if __name__ == '__main__':
-    directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
+#     directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
+    
+    coins = get_immediate_subdirectories(directorypath)
+    
+#     for root, dirs, files in os.walk(directorypath):
+# #         print(root)
+#         print(dirs)
+# #         print(files)
+
+    #directorypath = "/extract_coin/c"
     combi = rSubset(coins, r)
     with open("finalresult.txt","w+") as fr:
         for thiscombi in combi:
