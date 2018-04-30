@@ -7,10 +7,11 @@ import os
 r = 2
 
 #change the home directory of coins
-directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
+directorypath = "C:/Users/User/Desktop/test_coins/c/"
 
 # put extension of the file that will be compared
-extension = "cpp"
+#extension = "cpp"
+extension = ["c", "cpp", "h"]
 
 def rSubset(arr, r):
  
@@ -69,15 +70,39 @@ def getSecondFileExtension(line):
         extension = line[(index+1):endindex]
     return extension
 
+# old version that uses only 1 file extension
+# # returns 1 if both file have wanted extension, 0 if first file does not, -1 if second file does not, 0 if both do not
+# def meetsRequirement(line):
+# #     print("line = " + line)
+# #     print("First file's extension = " + getFirstFileExtension(line))
+# #     print("Second file's extension = " + getSecondFileExtension(line))
+#     if ((getFirstFileExtension(line) == extension) and (getSecondFileExtension(line) == extension)):
+#         return 1
+#     if (getFirstFileExtension(line) != extension):
+#         return 0
+#     return -1
+
+
 # returns 1 if both file have wanted extension, 0 if first file does not, -1 if second file does not, 0 if both do not
 def meetsRequirement(line):
 #     print("line = " + line)
 #     print("First file's extension = " + getFirstFileExtension(line))
 #     print("Second file's extension = " + getSecondFileExtension(line))
-    if ((getFirstFileExtension(line) == extension) and (getSecondFileExtension(line) == extension)):
+    firstfile = 0
+    secondfile = 0
+    for ext in extension:
+        if (getFirstFileExtension(line) == ext):
+            firstfile = 1
+            break
+    for ext in extension:
+        if (getSecondFileExtension(line) == ext):
+            secondfile = 1
+            break    
+    if ((firstfile == 1) and (secondfile == 1)):
         return 1
-    if (getFirstFileExtension(line) != extension):
-        return 0
+    if (firstfile == 0):
+        return 0    
+    
     return -1
 
 # gets a path to the first file
@@ -107,6 +132,7 @@ if __name__ == '__main__':
 
     #directorypath = "/extract_coin/c"
     combi = rSubset(coins, r)
+#     print(combi)
     with open("finalresult.txt","w+") as fr:
         for thiscombi in combi:
             totalsum = 0
@@ -114,6 +140,9 @@ if __name__ == '__main__':
             print(thiscombi)
             coin1path = directorypath+ thiscombi[0] 
             coin2path = directorypath + thiscombi[1] 
+            #print("coin1path = " + coin1path)
+            #print("coin2path = " + coin2path)
+
             call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o","result.txt", coin1path, coin2path])
             with open("result.txt", "r+") as fi:
                 while(1):
@@ -121,8 +150,8 @@ if __name__ == '__main__':
                     if(line[:12] == "Total input:"):
                         break
                 with open("processedresult.txt", "w+") as fo:
-                    coin1 = "coins/"+thiscombi[0]
-                    coin2 = "coins/"+thiscombi[1]
+                    coin1 = thiscombi[0]
+                    coin2 = thiscombi[1]
                     for thisline in fi:
                         # write only if the line contains both coins being compared
                         if ((coin1 in thisline) and (coin2 in thisline)):
@@ -170,7 +199,10 @@ if __name__ == '__main__':
                             for line in lines:
                                 if filetodelete not in line:
                                     fo.write(line)
-                
-                fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = " + str((totalsum / count)) + "\n")
-                
+                if (count != 0):
+                    fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = " + str((totalsum / count)) + "\n")
+                    fr.flush()
+                else:
+                    fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = count was zero!!!!!!" + "\n")
+                    fr.flush()
             

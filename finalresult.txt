@@ -1,3 +1,2 @@
-Similarity percentage between bitcoin and BitcoinDiamond = 78
-Similarity percentage between bitcoin and BitcoinPrivate = 49
-Similarity percentage between BitcoinDiamond and BitcoinPrivate = 62
+Similarity percentage between adshares-esc-archive-master and AElfProject-AElf-archive-dev = count was zero!!!!!!
+Similarity percentage between adshares-esc-archive-master and AElfProject-aelf-asset-chain-archive-master = 15
