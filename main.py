@@ -2,6 +2,12 @@ from subprocess import call
 # Function which returns subset or r length from n
 from itertools import combinations
 import os
+import multiprocessing
+import time
+import signal
+from utils import delay
+import thread
+#from eventlet.timeout import Timeout
 
 #coins = ["bitcoin", "BTCGPU", "rippled", "BitcoinDiamond", "BitcoinPrivate", "bytecoin", "litecoin", "nano"]
 r = 2
@@ -11,7 +17,7 @@ directorypath = "C:/Users/User/Desktop/test_coins/c/"
 
 # put extension of the file that will be compared
 #extension = "cpp"
-extension = ["c", "cpp", "h"]
+extension = ["c", "cpp", "h", "cc"]
 
 def rSubset(arr, r):
  
@@ -120,6 +126,14 @@ def get_immediate_subdirectories(a_dir):
     return [name for name in os.listdir(a_dir)
             if os.path.isdir(os.path.join(a_dir, name))]
 
+@delay(10.0)
+def callSIM(coin1path, coin2path):
+    call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o","result.txt", coin1path, coin2path])
+
+def handler(signum, frame):
+    print "Forever is over!"
+    raise Exception("end of time")
+
 if __name__ == '__main__':
 #     directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
     
@@ -133,8 +147,13 @@ if __name__ == '__main__':
     #directorypath = "/extract_coin/c"
     combi = rSubset(coins, r)
 #     print(combi)
-    with open("finalresult.txt","w+") as fr:
+    with open("finalresult4.txt","w+") as fr:
+        ismet = 0
         for thiscombi in combi:
+            if (ismet == 0):
+                if(not ((thiscombi[0] == "AElfProject-aelf-asset-chain-archive-master"))):
+                    ismet = 1
+                    continue
             totalsum = 0
             count = 0
             print(thiscombi)
@@ -143,7 +162,29 @@ if __name__ == '__main__':
             #print("coin1path = " + coin1path)
             #print("coin2path = " + coin2path)
 
+
             call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o","result.txt", coin1path, coin2path])
+#             callSIM(coin1path, coin2path)
+             # Start foo as a process
+           
+
+
+
+#             p = multiprocessing.Process(target=callSIM, name="callSIM", args=(coin1path, coin2path))
+#             p.start()
+#         
+#             # Wait 10 seconds for foo
+#             time.sleep(100)
+#             continue
+#             # Terminate foo
+#             p.terminate()
+#          
+#             # Cleanup
+#             p.join()
+
+           
+           
+           
             with open("result.txt", "r+") as fi:
                 while(1):
                     line = fi.readline()
