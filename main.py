@@ -6,7 +6,8 @@ import multiprocessing
 import time
 import signal
 from utils import delay
-import thread
+import threading
+import Queue
 #from eventlet.timeout import Timeout
 
 #coins = ["bitcoin", "BTCGPU", "rippled", "BitcoinDiamond", "BitcoinPrivate", "bytecoin", "litecoin", "nano"]
@@ -134,36 +135,15 @@ def handler(signum, frame):
     print "Forever is over!"
     raise Exception("end of time")
 
-if __name__ == '__main__':
-#     directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
-    
-    coins = get_immediate_subdirectories(directorypath)
-    
-#     for root, dirs, files in os.walk(directorypath):
-# #         print(root)
-#         print(dirs)
-# #         print(files)
-
-    #directorypath = "/extract_coin/c"
-    combi = rSubset(coins, r)
-#     print(combi)
-    with open("finalresult4.txt","w+") as fr:
-        ismet = 0
-        for thiscombi in combi:
-            if (ismet == 0):
-                if(not ((thiscombi[0] == "AElfProject-aelf-asset-chain-archive-master"))):
-                    ismet = 1
-                    continue
-            totalsum = 0
-            count = 0
-            print(thiscombi)
-            coin1path = directorypath+ thiscombi[0] 
-            coin2path = directorypath + thiscombi[1] 
-            #print("coin1path = " + coin1path)
-            #print("coin2path = " + coin2path)
-
-
-            call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o","result.txt", coin1path, coin2path])
+def comparecoins(thiscombi):
+    totalsum = 0
+    count = 0
+    print(thiscombi)
+    coin1path = directorypath+ thiscombi[0] 
+    coin2path = directorypath + thiscombi[1] 
+    resultfilename = thiscombi[0] + "_" + thiscombi[1] + "_result.txt"
+    processedresultname = thiscombi[0] + "_" + thiscombi[1] + "_processedresult.txt"
+    call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o",resultfilename, coin1path, coin2path])
 #             callSIM(coin1path, coin2path)
              # Start foo as a process
            
@@ -185,65 +165,211 @@ if __name__ == '__main__':
            
            
            
-            with open("result.txt", "r+") as fi:
-                while(1):
-                    line = fi.readline()
-                    if(line[:12] == "Total input:"):
-                        break
-                with open("processedresult.txt", "w+") as fo:
-                    coin1 = thiscombi[0]
-                    coin2 = thiscombi[1]
-                    for thisline in fi:
-                        # write only if the line contains both coins being compared
-                        if ((coin1 in thisline) and (coin2 in thisline)):
-                            #count = count + 1
-                            #p = getPercentage(thisline)
-                            #totalsum = totalsum + p
-                            fo.write(thisline)
-                            
-                while(1):
-                    f = open("processedresult.txt", "r")
-                    lines = f.readlines()
-                    f.close
-                    if (len(lines) == 0):
-                        break
-                    firstline = lines[0]
+    with open(resultfilename, "r+") as fi:
+        while(1):
+            line = fi.readline()
+            print(line)
+            if(line[:12] == "Total input:"):
+                break
+        with open(processedresultname, "w+") as fo:
+            coin1 = thiscombi[0]
+            coin2 = thiscombi[1]
+            for thisline in fi:
+                # write only if the line contains both coins being compared
+                if ((coin1 in thisline) and (coin2 in thisline)):
+                    #count = count + 1
+                    #p = getPercentage(thisline)
+                    #totalsum = totalsum + p
+                    fo.write(thisline)
                     
-                    requirementResult = meetsRequirement(firstline)
-                    filetosearch = getFirstFile(firstline)
-                    
-                    # if has wanted extension
-                    if (requirementResult == 1):
-                        count = count + 1
-                        maxpercentage = 0
-                        for line in lines:
-                            if (filetosearch == getFirstFile(line)):
-                                if (meetsRequirement(line) == 1):
-                                    thispercentage = getPercentage(line)
-                                    if (thispercentage > maxpercentage):
-                                        maxpercentage = thispercentage
-                        #print(filetosearch + " showed max of " + str(maxpercentage) + " similarity \n")
-                        totalsum = totalsum + maxpercentage
-                        # done with this file, delete all lines containing this file as first file
-                        with open("processedresult.txt", "w+") as fo:
-                            for line in lines:
-                                if (getFirstFile(line) != filetosearch):
-                                    fo.write(line)
-                        
-                    # else, delete all the lines containing the file with not wanted extension
+        while(1):
+            f = open(processedresultname, "r")
+            lines = f.readlines()
+            f.close
+            if (len(lines) == 0):
+                break
+            firstline = lines[0]
+            
+            requirementResult = meetsRequirement(firstline)
+            filetosearch = getFirstFile(firstline)
+            
+            # if has wanted extension
+            if (requirementResult == 1):
+                count = count + 1
+                maxpercentage = 0
+                for line in lines:
+                    if (filetosearch == getFirstFile(line)):
+                        if (meetsRequirement(line) == 1):
+                            thispercentage = getPercentage(line)
+                            if (thispercentage > maxpercentage):
+                                maxpercentage = thispercentage
+                #print(filetosearch + " showed max of " + str(maxpercentage) + " similarity \n")
+                totalsum = totalsum + maxpercentage
+                # done with this file, delete all lines containing this file as first file
+                with open(processedresultname, "w+") as fo:
+                    for line in lines:
+                        if (getFirstFile(line) != filetosearch):
+                            fo.write(line)
+                
+            # else, delete all the lines containing the file with not wanted extension
+            else:
+                with open(processedresultname, "w+") as fo:
+                    if (requirementResult == 0):
+                        filetodelete = getFirstFile(firstline)
                     else:
-                        with open("processedresult.txt", "w+") as fo:
-                            if (requirementResult == 0):
-                                filetodelete = getFirstFile(firstline)
-                            else:
-                                filetodelete = getSecondFile(firstline)
-                            for line in lines:
-                                if filetodelete not in line:
-                                    fo.write(line)
-                if (count != 0):
-                    fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = " + str((totalsum / count)) + "\n")
-                    fr.flush()
-                else:
-                    fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = count was zero!!!!!!" + "\n")
-                    fr.flush()
+                        filetodelete = getSecondFile(firstline)
+                    for line in lines:
+                        if filetodelete not in line:
+                            fo.write(line)
+        if (count != 0):
+            fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = " + str((totalsum / count)) + "\n")
+            fr.flush()
+        else:
+            fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = count was zero!!!!!!" + "\n")
+            fr.flush()
+
+def worker():
+    while True:
+        thiscombi = q.get()
+        comparecoins(thiscombi)
+        q.task_done()
+
+
+if __name__ == '__main__':
+#     directorypath = "C:\Users\User\Desktop\sim_exe_3_0_2\coins/"
+    
+    coins = get_immediate_subdirectories(directorypath)
+    
+#     for root, dirs, files in os.walk(directorypath):
+# #         print(root)
+#         print(dirs)
+# #         print(files)
+
+    q = Queue.Queue()
+
+    #directorypath = "/extract_coin/c"
+    combi = rSubset(coins, r)
+#     print(combi)
+    with open("finalresult4.txt","w+") as fr:
+#         ismet = 0
+
+        for i in range(10):
+            t = threading.Thread(target=worker)
+            t.daemon = True
+            t.start()
+        
+        for thiscombi in combi:
+            q.put(thiscombi)
+#             if (ismet == 0):
+#                 if(not ((thiscombi[0] == "AElfProject-aelf-asset-chain-archive-master"))):
+#                     ismet = 1
+#                     continue
+
+
+
+#             totalsum = 0
+#             count = 0
+#             print(thiscombi)
+#             coin1path = directorypath+ thiscombi[0] 
+#             coin2path = directorypath + thiscombi[1] 
+            
+            
+            
+            #print("coin1path = " + coin1path)
+            #print("coin2path = " + coin2path)
+
+
+#             call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_c++.exe", "-p", "-a", "-R","-o","result.txt", coin1path, coin2path])
+# #             callSIM(coin1path, coin2path)
+#              # Start foo as a process
+#            
+#            
+
+
+#             try:
+#                thread.start_new_thread( comparecoins, (coin1path, coin2path, ) )
+#             except:
+#                print "Error: unable to start thread"
+               
+               
+               
+               
+# 
+# 
+# #             p = multiprocessing.Process(target=callSIM, name="callSIM", args=(coin1path, coin2path))
+# #             p.start()
+# #         
+# #             # Wait 10 seconds for foo
+# #             time.sleep(100)
+# #             continue
+# #             # Terminate foo
+# #             p.terminate()
+# #          
+# #             # Cleanup
+# #             p.join()
+# 
+#            
+#            
+#            
+#             with open("result.txt", "r+") as fi:
+#                 while(1):
+#                     line = fi.readline()
+#                     if(line[:12] == "Total input:"):
+#                         break
+#                 with open("processedresult.txt", "w+") as fo:
+#                     coin1 = thiscombi[0]
+#                     coin2 = thiscombi[1]
+#                     for thisline in fi:
+#                         # write only if the line contains both coins being compared
+#                         if ((coin1 in thisline) and (coin2 in thisline)):
+#                             #count = count + 1
+#                             #p = getPercentage(thisline)
+#                             #totalsum = totalsum + p
+#                             fo.write(thisline)
+#                             
+#                 while(1):
+#                     f = open("processedresult.txt", "r")
+#                     lines = f.readlines()
+#                     f.close
+#                     if (len(lines) == 0):
+#                         break
+#                     firstline = lines[0]
+#                     
+#                     requirementResult = meetsRequirement(firstline)
+#                     filetosearch = getFirstFile(firstline)
+#                     
+#                     # if has wanted extension
+#                     if (requirementResult == 1):
+#                         count = count + 1
+#                         maxpercentage = 0
+#                         for line in lines:
+#                             if (filetosearch == getFirstFile(line)):
+#                                 if (meetsRequirement(line) == 1):
+#                                     thispercentage = getPercentage(line)
+#                                     if (thispercentage > maxpercentage):
+#                                         maxpercentage = thispercentage
+#                         #print(filetosearch + " showed max of " + str(maxpercentage) + " similarity \n")
+#                         totalsum = totalsum + maxpercentage
+#                         # done with this file, delete all lines containing this file as first file
+#                         with open("processedresult.txt", "w+") as fo:
+#                             for line in lines:
+#                                 if (getFirstFile(line) != filetosearch):
+#                                     fo.write(line)
+#                         
+#                     # else, delete all the lines containing the file with not wanted extension
+#                     else:
+#                         with open("processedresult.txt", "w+") as fo:
+#                             if (requirementResult == 0):
+#                                 filetodelete = getFirstFile(firstline)
+#                             else:
+#                                 filetodelete = getSecondFile(firstline)
+#                             for line in lines:
+#                                 if filetodelete not in line:
+#                                     fo.write(line)
+#                 if (count != 0):
+#                     fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = " + str((totalsum / count)) + "\n")
+#                     fr.flush()
+#                 else:
+#                     fr.write("Similarity percentage between " + thiscombi[0] + " and " + thiscombi[1] + " = count was zero!!!!!!" + "\n")
+#                     fr.flush()
             

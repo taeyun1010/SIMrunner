@@ -1,0 +1,1 @@
+Similarity percentage between adshares-esc-archive-master and AElfProject-aelf-asset-chain-archive-master = 15
