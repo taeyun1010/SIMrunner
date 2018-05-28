@@ -8,7 +8,9 @@ import signal
 from utils import delay
 import threading
 import Queue
-from main_old import compare
+
+# TODO
+from main_old_java import compare
 import subprocess
 import sys
 #from eventlet.timeout import Timeout
@@ -17,7 +19,7 @@ import sys
 r = 2
 
 #change the home directory of coins
-directorypath = "C:/Users/User/Desktop/test_coins/go/"
+directorypath = "C:/Users/User/Desktop/java/java/"
 
 # put extension of the file that will be compared
 
@@ -26,7 +28,7 @@ directorypath = "C:/Users/User/Desktop/test_coins/go/"
 
 
 # used these extensions to compare files in go directory
-extension = ["go"]
+extension = ["java"]
 
 def rSubset(arr, r):
  
@@ -222,6 +224,19 @@ if __name__ == '__main__':
         
         # get the size of directory
         total_size1 = 0
+        
+        #
+#         counter = 0 
+#         for path, dirs, files in os.walk("C:\\Users\\User\\Desktop\\java\\java"):
+#             for dir in dirs:
+#                 for path2, dirs2, files2 in os.walk(os.path.join("C:\\Users\\User\\Desktop\\java\\java",dir)):
+#                     for f in files2:
+#                         temp = str(counter)
+#                         temp = temp + ".java"
+#                         os.rename(os.path.join(path2,f), os.path.join(path2,temp))
+#                         counter = counter + 1
+        #
+        
         for path, dirs, files in os.walk(coin1path):
             for f in files:
                 fp = os.path.join(path, f)

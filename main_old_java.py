@@ -19,14 +19,14 @@ r = 2
 # c directory path
 # directorypath = "C:/Users/User/Desktop/test_coins/c/"
 # go directory path
-directorypath = "C:/Users/User/Desktop/test_coins/go/"
+directorypath = "C:/Users/User/Desktop/test_coins/java/java/"
 
 #TODO
 # put extension of the file that will be compared
 # c directory extensions
 # extension = ["c", "cpp", "h", "cc"]
 # go directory extensions
-extension = ["go"]
+extension = ["java"]
 
 
 def rSubset(arr, r):
@@ -160,7 +160,7 @@ def compare(coin1, coin2):
  
     print(coin1 + coin2)
     #TODO
-    finalresultpath = "go_tempresults1/" + coin1 + "_" + coin2 + "_finalresult.txt"
+    finalresultpath = "java_finalresults1/" + coin1 + "_" + coin2 + "_finalresult.txt"
     resultpath = coin1 + "_" + coin2 + "_result.txt"
     percentMapping = []
     with open(finalresultpath,"w+") as fr:
@@ -178,7 +178,7 @@ def compare(coin1, coin2):
 
         #TODO
         #used to compare files in go directory
-        call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_text.exe", "-p", "-a", "-R","-o",resultpath, coin1path, coin2path])
+        call(["C:\Users\User\Desktop\sim_exe_3_0_2\sim_java.exe", "-p", "-a", "-R","-o",resultpath, coin1path, coin2path])
 
 
 
@@ -281,5 +281,5 @@ def compare(coin1, coin2):
 
 
 if __name__ == '__main__':
-    compare("skycoin-bbs-archive-master", "skycoin-cxo-archive-master")
+    compare("AdExBlockchain-go-ethereum-archive-master", "AdExBlockchain-universal-state-channels-archive-master")
         
